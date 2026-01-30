@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alessa Copy Generator</title>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --surface-hover: #252525;
+            --border: #333;
+            --text: #e0e0e0;
+            --text-muted: #888;
+            --accent: #d4af37;
+            --accent-dim: #b8973c;
+            --success: #4ade80;
+            --warning: #fbbf24;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .stat {
+            background: var(--surface);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+        
+        .stat strong {
+            color: var(--accent);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 1000px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+        
+        .panel {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .panel h2 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .benefit-tag {
+            padding: 8px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        .benefit-tag:hover {
+            border-color: var(--accent-dim);
+        }
+        
+        .benefit-tag.selected {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+        
+        .benefit-tag .count {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-left: 4px;
+        }
+        
+        .btn {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--accent-dim);
+        }
+        
+        .btn-secondary {
+            background: var(--surface-hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .output-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 150px;
+            white-space: pre-wrap;
+            font-family: inherit;
+            line-height: 1.8;
+        }
+        
+        .output-box.prompt {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .copy-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 0.85rem;
+        }
+        
+        .history-item {
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .history-item .product {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .history-item .angle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .reference-section {
+            margin-top: 20px;
+        }
+        
+        .reference-toggle {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .reference-toggle:hover {
+            background: var(--surface-hover);
+        }
+        
+        .reference-content {
+            display: none;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+        
+        .reference-content.open {
+            display: block;
+        }
+        
+        .power-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .power-word {
+            background: var(--surface-hover);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .rules-list {
+            list-style: none;
+        }
+        
+        .rules-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .rules-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .rules-list code {
+            background: var(--surface-hover);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .emoji-hint {
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>✨ Alessa Copy Generator</h1>
+        <div class="stats">
+            <div class="stat">Generated: <strong id="totalCount">0</strong></div>
+            <div class="stat">Today: <strong id="todayCount">0</strong></div>
+        </div>
+    </header>
+    
+    <div class="grid">
+        <div>
+            <div class="panel">
+                <h2>📦 Product Details</h2>
+                
+                <label>Product Type</label>
+                <select id="productType">
+                    <option value="">Select type...</option>
+                    <option value="dress">Dress</option>
+                    <option value="top">Top / Blouse</option>
+                    <option value="pants">Pants / Trousers</option>
+                    <option value="skirt">Skirt</option>
+                    <option value="jacket">Jacket / Blazer</option>
+                    <option value="coat">Coat</option>
+                    <option value="jumpsuit">Jumpsuit / Romper</option>
+                    <option value="set">Set / Coord</option>
+                    <option value="swimwear">Swimwear</option>
+                    <option value="lingerie">Lingerie</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+                
+                <label>Key Features (material, color, details)</label>
+                <input type="text" id="features" placeholder="e.g., tweed, feather trim, black, fitted">
+                
+                <label>Occasion / Vibe (optional)</label>
+                <input type="text" id="occasion" placeholder="e.g., date night, office, cocktail party">
+                
+                <label>Product URL or Name (for tracking)</label>
+                <input type="text" id="productName" placeholder="e.g., Feather Tweed Mini Dress">
+            </div>
+            
+            <div class="panel" style="margin-top: 20px;">
+                <h2>🎯 Emotional Angle (Pick 1-2)</h2>
+                <div class="benefits-grid" id="benefitsGrid">
+                    <!-- Generated by JS -->
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                    Numbers show recent usage. Pick less-used angles for variety.
+                </p>
+            </div>
+            
+            <div class="panel" style="margin-top: 20px;">
+                <button class="btn" onclick="generatePrompt()">Generate Copy Prompt</button>
+                <button class="btn btn-secondary copy-btn" onclick="copyPrompt()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+        
+        <div>
+            <div class="panel">
+                <h2>📝 Generated Prompt</h2>
+                <div class="output-box prompt" id="promptOutput">
+                    Fill in product details and select an emotional angle, then click "Generate Copy Prompt".
+                    
+                    Copy the prompt and send it to Nova for copy generation.
+                </div>
+            </div>
+            
+            <div class="panel" style="margin-top: 20px;">
+                <h2>📚 Recent History</h2>
+                <div id="historyList">
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">No products generated yet.</p>
+                </div>
+            </div>
+            
+            <div class="panel reference-section" style="margin-top: 20px;">
+                <h2>📖 Quick Reference</h2>
+                
+                <div class="reference-toggle" onclick="toggleRef('rules')">
+                    <span>✅ Copy Rules</span>
+                    <span>▼</span>
+                </div>
+                <div class="reference-content" id="rules">
+                    <ul class="rules-list">
+                        <li>Use <code>-</code> not <code>—</code> (em dash = AI tell)</li>
+                        <li>80-150 characters - short, scroll-stopping</li>
+                        <li>1-2 emojis max <span class="emoji-hint">✨💫🔥💎👑⭐</span></li>
+                        <li>American spelling (recognize, color, favorite)</li>
+                        <li>Benefit-led, not feature-led</li>
+                        <li>"Needs nothing - just you" energy</li>
+                        <li>Same angle max 1 per 20-30 products</li>
+                    </ul>
+                </div>
+                
+                <div class="reference-toggle" onclick="toggleRef('powerwords')">
+                    <span>⚡ Power Verbs</span>
+                    <span>▼</span>
+                </div>
+                <div class="reference-content" id="powerwords">
+                    <div class="power-words">
+                        <span class="power-word">mesmerize</span>
+                        <span class="power-word">captivate</span>
+                        <span class="power-word">transform</span>
+                        <span class="power-word">entice</span>
+                        <span class="power-word">ignite</span>
+                        <span class="power-word">slay</span>
+                        <span class="power-word">turn heads</span>
+                        <span class="power-word">flaunt</span>
+                        <span class="power-word">glow up</span>
+                        <span class="power-word">serve</span>
+                        <span class="power-word">flex</span>
+                        <span class="power-word">vibe</span>
+                    </div>
+                </div>
+                
+                <div class="reference-toggle" onclick="toggleRef('patterns')">
+                    <span>💡 Winning Patterns</span>
+                    <span>▼</span>
+                </div>
+                <div class="reference-content" id="patterns">
+                    <ul class="rules-list">
+                        <li>"The [item] that does X so you don't have to"</li>
+                        <li>"Needs nothing - just you"</li>
+                        <li>"The kind of [entrance] people talk about later"</li>
+                        <li>Contrast structure (problem → solution)</li>
+                        <li>Effortless > trying hard</li>
+                        <li>"Some [items] need X. This one needs nothing."</li>
+                    </ul>
+                </div>
+                
+                <div class="reference-toggle" onclick="toggleRef('avoid')">
+                    <span>🚫 Avoid These</span>
+                    <span>▼</span>
+                </div>
+                <div class="reference-content" id="avoid">
+                    <div class="power-words">
+                        <span class="power-word">chic</span>
+                        <span class="power-word">must-have</span>
+                        <span class="power-word">trendy</span>
+                        <span class="power-word">iconic</span>
+                        <span class="power-word">vintage</span>
+                        <span class="power-word">the new black</span>
+                        <span class="power-word">femme fatale</span>
+                        <span class="power-word">it girl</span>
+                        <span class="power-word">mix & match</span>
+                        <span class="power-word">power dressing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Benefits data with usage tracking
+        const benefits = [
+            { id: 'confident', emoji: '👑', label: 'Confident', count: 0 },
+            { id: 'standout', emoji: '⭐', label: 'Stand Out', count: 0 },
+            { id: 'sexy', emoji: '🔥', label: 'Sexy', count: 0 },
+            { id: 'fashion', emoji: '👗', label: 'Fashion Identity', count: 0 },
+            { id: 'social', emoji: '👑', label: 'Social Status', count: 0 },
+            { id: 'energy', emoji: '⚡', label: 'Energy', count: 0 },
+            { id: 'roles', emoji: '👩‍👧', label: 'Roles', count: 0 },
+            { id: 'problem', emoji: '🛡️', label: 'Problem/Solution', count: 0 },
+            { id: 'belonging', emoji: '⭐', label: 'Belonging', count: 0 },
+            { id: 'career', emoji: '💼', label: 'Career', count: 0 },
+            { id: 'competition', emoji: '⚔️', label: 'Competition', count: 0 },
+            { id: 'revenge', emoji: '🔥', label: 'Revenge', count: 0 },
+        ];
+        
+        let selectedBenefits = [];
+        let history = [];
+        
+        // Load from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('alessa-copy-state');
+            if (saved) {
+                const state = JSON.parse(saved);
+                benefits.forEach(b => {
+                    const saved = state.benefits?.find(s => s.id === b.id);
+                    if (saved) b.count = saved.count;
+                });
+                history = state.history || [];
+            }
+            renderBenefits();
+            renderHistory();
+            updateStats();
+        }
+        
+        function saveState() {
+            localStorage.setItem('alessa-copy-state', JSON.stringify({
+                benefits: benefits.map(b => ({ id: b.id, count: b.count })),
+                history: history.slice(0, 50) // Keep last 50
+            }));
+        }
+        
+        function renderBenefits() {
+            const grid = document.getElementById('benefitsGrid');
+            grid.innerHTML = benefits.map(b => `
+                <div class="benefit-tag ${selectedBenefits.includes(b.id) ? 'selected' : ''}" 
+                     onclick="toggleBenefit('${b.id}')">
+                    ${b.emoji} ${b.label}<span class="count">(${b.count})</span>
+                </div>
+            `).join('');
+        }
+        
+        function toggleBenefit(id) {
+            if (selectedBenefits.includes(id)) {
+                selectedBenefits = selectedBenefits.filter(b => b !== id);
+            } else if (selectedBenefits.length < 2) {
+                selectedBenefits.push(id);
+            }
+            renderBenefits();
+        }
+        
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            if (history.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">No products generated yet.</p>';
+                return;
+            }
+            list.innerHTML = history.slice(0, 10).map(h => `
+                <div class="history-item">
+                    <div class="product">${h.name || 'Unnamed'}</div>
+                    <div class="angle">${h.angles.join(', ')} - ${h.date}</div>
+                </div>
+            `).join('');
+        }
+        
+        function updateStats() {
+            const total = history.length;
+            const today = history.filter(h => h.date === new Date().toLocaleDateString()).length;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('todayCount').textContent = today;
+        }
+        
+        function toggleRef(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+        
+        function generatePrompt() {
+            const type = document.getElementById('productType').value;
+            const features = document.getElementById('features').value;
+            const occasion = document.getElementById('occasion').value;
+            const name = document.getElementById('productName').value;
+            
+            if (!type) {
+                alert('Please select a product type');
+                return;
+            }
+            
+            if (selectedBenefits.length === 0) {
+                alert('Please select at least one emotional angle');
+                return;
+            }
+            
+            const selectedAngles = selectedBenefits.map(id => 
+                benefits.find(b => b.id === id)?.label
+            ).filter(Boolean);
+            
+            const prompt = `Generate 3 English product copy variations for this Alessa product:
+
+**Product:** ${type}${name ? ` - ${name}` : ''}
+**Features:** ${features || 'Not specified'}
+**Occasion:** ${occasion || 'General'}
+**Emotional angle:** ${selectedAngles.join(' + ')}
+
+**Rules:**
+- 80-150 characters each
+- Use "-" not "—" (em dash = AI tell)
+- 1-2 emojis max, varied placement
+- American spelling
+- Benefit-led, effortless energy
+- No overused terms (chic, must-have, iconic, vintage)
+
+**Winning patterns:**
+- "The [item] that does X so you don't have to"
+- "Needs nothing - just you"
+- "The kind of [entrance] people talk about later"
+
+Give me 3 variations with different structures.`;
+            
+            document.getElementById('promptOutput').textContent = prompt;
+            
+            // Update usage counts
+            selectedBenefits.forEach(id => {
+                const benefit = benefits.find(b => b.id === id);
+                if (benefit) benefit.count++;
+            });
+            
+            // Add to history
+            history.unshift({
+                name: name || `${type} - ${features.substring(0, 30)}`,
+                angles: selectedAngles,
+                date: new Date().toLocaleDateString()
+            });
+            
+            saveState();
+            renderBenefits();
+            renderHistory();
+            updateStats();
+        }
+        
+        function copyPrompt() {
+            const prompt = document.getElementById('promptOutput').textContent;
+            navigator.clipboard.writeText(prompt).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = '📋 Copy to Clipboard', 2000);
+            });
+        }
+        
+        // Initialize
+        loadState();
+    </script>
+</body>
+</html>
